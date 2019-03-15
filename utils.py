@@ -5,6 +5,7 @@ class Number:
         self.value = value
 
 
+# 以utf-8的格式导入相关文件
 def load_file(path):
     lines = []
     with open(path, 'r', encoding='utf_8') as file:

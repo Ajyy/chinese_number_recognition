@@ -1,6 +1,6 @@
 from utils import Number
 
-# 初始化一些基本参数
+# 初始化一些基本参数，包括中文基本数字1-9与单位
 chinese_num = {'一': 1, '二': 2, '两': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9}
 
 units = {'亿': 100000000, '万': 10000, '千': 1000, '百': 100, '十': 10}
@@ -110,17 +110,6 @@ def process_sentence(line):
         i = i + 1
 
     return nums_inf
-
-# def test_cat(num):
-#     unit_idx = []
-#     for idx in range(len(num)):
-#         if num[idx] in units:
-#             unit_idx.append(idx)
-#
-#     for i in range(len(unit_idx)):
-#         for j in range(i+1, len(unit_idx)):
-#             if rules[num[unit_idx[i]]] < rules[num[unit_idx[j]]]:
-#
 
 
 def sentence_num_translate(sentence):
