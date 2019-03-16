@@ -55,29 +55,39 @@ def test_for_non_unit_num(num):
     return en_num
 
 
-# def test_two_num(num):
-#     if len(num) <= 2:
-#         return [num]
-#
-#     unit_inf = find_size(num)
-#     unit_idx = num.find(unit_inf[0])
-#     if unit_inf[0] == '万':
-#         if num[unit_idx-1] not in rules:
-#             nums_list1 = test_two_num(num[:unit_idx+1])
-#         else:
-#             nums_list1 = test_two_num(num[:unit_idx])
-#
-#         nums_list2 = test_two_num(num[unit_idx + 1:])
-#         return nums_list1[:len(nums_list1)-1] + [nums_list1[-1]+'万'+nums_list2[0]] + nums_list2[1:]
-#
-#     if unit_inf[0] == '千':
-#         if len(num[:unit_idx]) > 1:
-#             nums_list1 = test_two_num(num[:unit_idx-2])
-#         else:
-#             nums_list1 = []
-#
-#         nums_list2 = test_two_num(num[unit_idx + 1:])
-#         return nums_list1 + [num[unit_idx - 1:unit_idx + 1] + nums_list2[0]] + nums_list2[1:]
+def test_two_num(num):
+    if len(num) <= 2 or num.isdigit():
+        return [num]
+
+    unit_inf = find_size(num)
+    unit_idx = num.find(unit_inf[0])
+    if unit_inf[0] == '万' or unit_inf[0] == '亿':
+        nums_after = test_two_num(num[unit_idx + 1:])
+        if unit_idx == 1:
+            return [num[:2]+nums_after[0]]+nums_after[1:]
+        if num[unit_idx - 1] in chinese_num:
+            if num[unit_idx - 2] != '十':
+                return [num[:unit_idx - 1]] + [num[unit_idx - 1:unit_idx + 1] + nums_after[0]] + nums_after[1:]
+            else:
+                return [num[:unit_idx + 1] + nums_after[0]] + nums_after[1:]
+        if num[unit_idx-1] in rules:
+            nums_before = test_two_num(num[:unit_idx])
+            return nums_before[:-1] + [nums_before[-1] + unit_inf[0] + nums_after[0]] + nums_after[1:]
+
+    if unit_inf[0] == '千':
+        nums_after = test_two_num(num[unit_idx + 1:])
+        if unit_idx == 1:
+            return [num[:2] + nums_after[0]] + nums_after[1:]
+        else:
+            return [num[:unit_idx - 1]] + [num[unit_idx - 1:unit_idx + 1] + nums_after[0]] + nums_after[1:]
+
+    if unit_inf[0] == '百':
+        if unit_idx == 1:
+            return [num]
+        else:
+            return [num[:unit_idx - 1]] + [num[unit_idx - 1:]]
+
+    return [num]
 
 
 def get_value(num):
@@ -146,10 +156,11 @@ def process_sentence(line):
             i = i + 1
 
         if len(num) != 0:
-            # nums = test_two_num(preprocess_data(num))
-            # nums_inf = nums_inf + [(num, i - len(num) + 1) for num in nums]
-            nums_inf.append((preprocess_data(num), i - len(num) + 1))
+            process_num = preprocess_data(num)
+            nums = test_two_num(process_num)
+            nums_inf = nums_inf + [(sub_num, i - (len(num) - process_num.find(sub_num)) + 1) for sub_num in nums]
             num = ''
+            # nums_inf.append((preprocess_data(num), i - len(num) + 1))
 
         i = i + 1
 
