@@ -118,7 +118,8 @@ Information:
 
 Original sentence: 一千零一百
 Information:
-{'offset': 1, 'length': 5, 'value': 1100}
+{'offset': 1, 'length': 3, 'value': 1000}
+{'offset': 4, 'length': 2, 'value': 100}
 
 Original sentence: 一千零一十
 Information:
@@ -255,3 +256,24 @@ Information:
 Original sentence: 八千三百万
 Information:
 {'offset': 1, 'length': 5, 'value': 83000000}
+
+Original sentence: 三十三百
+Information:
+{'offset': 1, 'length': 2, 'value': 30}
+{'offset': 3, 'length': 2, 'value': 300}
+
+Original sentence: 四百四千
+Information:
+{'offset': 1, 'length': 2, 'value': 400}
+{'offset': 3, 'length': 2, 'value': 4000}
+
+Original sentence: 三亿三十三百
+Information:
+{'offset': 1, 'length': 4, 'value': 300000030}
+{'offset': 5, 'length': 2, 'value': 300}
+
+Original sentence: 六百三亿三十三百
+Information:
+{'offset': 1, 'length': 2, 'value': 600}
+{'offset': 3, 'length': 4, 'value': 300000030}
+{'offset': 7, 'length': 2, 'value': 300}
