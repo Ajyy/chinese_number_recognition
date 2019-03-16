@@ -1,4 +1,4 @@
-# chinese_number_recognition
+# chinese_number_recognition（更新中）
 没有参考网上资料，由自己独立完成以下部分。
 
 ## 文件结构说明
