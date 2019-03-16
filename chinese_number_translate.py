@@ -1,15 +1,9 @@
 from utils import Number
 
-# 初始化一些基本参数，包括中文基本数字1-9与单位
-chinese_num = {'一': 1, '二': 2, '两': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9}
+# 初始化一些基本参数，包括中文基本数字0-9与单位
+chinese_num = {'零': 0, '一': 1, '二': 2, '两': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9}
 
-units = {'亿': 100000000, '万': 10000, '千': 1000, '百': 100, '十': 10}
-rules = {'个': 1}
-keys = list(units.keys())
-for i in range(len(keys)):
-    for j in range(i + 1, len(keys)):
-        rules[keys[j] + keys[i]] = units[keys[i]] * units[keys[j]]
-    rules[keys[i]] = units[keys[i]]
+rules = {'亿': 100000000, '万': 10000, '千': 1000, '百': 100, '十': 10, '个': 1}
 
 
 def preprocess_data(num):
@@ -38,6 +32,47 @@ def find_size(num):
             return key, rules[key]
 
     return num_type, rules[num_type]
+
+
+def test_for_non_unit_num(num):
+    en_num = 0
+    base = 1
+    for idx in reversed(range(len(num))):
+        if num[idx] in rules or num[idx:idx + 2] in rules:
+            return 0
+        if num[idx].isdigit():
+            en_num = en_num + int(num[idx]) * base
+        else:
+            en_num = en_num + chinese_num[num[idx]] * base
+
+        base = base * 10
+
+    return en_num
+
+
+# def test_two_num(num):
+#     if len(num) <= 2:
+#         return [num]
+#
+#     unit_inf = find_size(num)
+#     unit_idx = num.find(unit_inf[0])
+#     if unit_inf[0] == '万':
+#         if num[unit_idx-1] not in rules:
+#             nums_list1 = test_two_num(num[:unit_idx+1])
+#         else:
+#             nums_list1 = test_two_num(num[:unit_idx])
+#
+#         nums_list2 = test_two_num(num[unit_idx + 1:])
+#         return nums_list1[:len(nums_list1)-1] + [nums_list1[-1]+'万'+nums_list2[0]] + nums_list2[1:]
+#
+#     if unit_inf[0] == '千':
+#         if len(num[:unit_idx]) > 1:
+#             nums_list1 = test_two_num(num[:unit_idx-2])
+#         else:
+#             nums_list1 = []
+#
+#         nums_list2 = test_two_num(num[unit_idx + 1:])
+#         return nums_list1 + [num[unit_idx - 1:unit_idx + 1] + nums_list2[0]] + nums_list2[1:]
 
 
 def get_value(num):
@@ -80,10 +115,13 @@ def cn_num_translate(num):
     :param num:
     :return:
     """
-    value = 0
+    value = test_for_non_unit_num(num)
+    if value > 0:
+        return value
+
     nums = num.split('零')
     for sub_num in nums:
-        value = value + get_value(preprocess_data(sub_num))
+        value = value + get_value(sub_num)
     return value
 
 
@@ -103,8 +141,9 @@ def process_sentence(line):
             i = i + 1
 
         if len(num) != 0:
-
-            nums_inf.append((num, i-len(num)+1))
+            # nums = test_two_num(preprocess_data(num))
+            # nums_inf = nums_inf + [(num, i - len(num) + 1) for num in nums]
+            nums_inf.append((preprocess_data(num), i - len(num) + 1))
             num = ''
 
         i = i + 1
