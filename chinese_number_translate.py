@@ -43,6 +43,7 @@ def test_for_non_unit_num(num):
     en_num = 0
     base = 1
     for idx in reversed(range(len(num))):
+        # 如果此下标对应的字是单位则返回0
         if num[idx] in rules or num[idx:idx + 2] in rules:
             return 0
         if num[idx].isdigit():
@@ -55,36 +56,51 @@ def test_for_non_unit_num(num):
     return en_num
 
 
-def test_two_num(num):
+def test_multiple_nums(num):
+    """
+    检测是否此数字需要分割成多个数字
+    :param num: 中文数字（包括各种形式）
+    :return: 返回一个数组，里面存储切割后的数字
+    """
     if len(num) <= 2 or num.isdigit():
         return [num]
 
+    # 获取这个数字的最大单位以及这个单位的下标值
     unit_inf = find_size(num)
     unit_idx = num.find(unit_inf[0])
     if unit_inf[0] == '万' or unit_inf[0] == '亿':
-        nums_after = test_two_num(num[unit_idx + 1:])
+        # 首先获取之后部分切割后的中文数字数组
+        nums_after = test_multiple_nums(num[unit_idx + 1:])
+        # 如果是1则前面部分不需要切割
         if unit_idx == 1:
             return [num[:2]+nums_after[0]]+nums_after[1:]
+        # 如果此单位之前一位是数字则切割
         if num[unit_idx - 1] in chinese_num:
             if num[unit_idx - 2] != '十':
                 return [num[:unit_idx - 1]] + [num[unit_idx - 1:unit_idx + 1] + nums_after[0]] + nums_after[1:]
             else:
                 return [num[:unit_idx + 1] + nums_after[0]] + nums_after[1:]
+        # 如果此单位前一位是单位则检测前面部分
         if num[unit_idx-1] in rules:
-            nums_before = test_two_num(num[:unit_idx])
+            nums_before = test_multiple_nums(num[:unit_idx])
             return nums_before[:-1] + [nums_before[-1] + unit_inf[0] + nums_after[0]] + nums_after[1:]
 
     if unit_inf[0] == '千':
-        nums_after = test_two_num(num[unit_idx + 1:])
+        # 首先获取单位之后部分切割后的中文数字数组
+        nums_after = test_multiple_nums(num[unit_idx + 1:])
+        # 如果是1则不需要检测
         if unit_idx == 1:
             return [num[:2] + nums_after[0]] + nums_after[1:]
         else:
+            # 不是则切割
             return [num[:unit_idx - 1]] + [num[unit_idx - 1:unit_idx + 1] + nums_after[0]] + nums_after[1:]
 
     if unit_inf[0] == '百':
+        # 如果是1，直接返回
         if unit_idx == 1:
             return [num]
         else:
+            # 不是则切割
             return [num[:unit_idx - 1]] + [num[unit_idx - 1:]]
 
     return [num]
@@ -134,6 +150,7 @@ def cn_num_translate(num):
     if value > 0:
         return value
 
+    # 首先用“零”对句子进行切割
     nums = num.split('零')
     for sub_num in nums:
         value = value + get_value(sub_num)
@@ -150,14 +167,17 @@ def process_sentence(line):
     num = ''
     i = 0
     while i < len(line):
+        # 如果i小于句子长度并且当前的字是单位或者数字或者逗号便进入循环
         while i < len(line) and \
                 ((line[i].isdigit() or line[i] in chinese_num or line[i] in rules) or line[i] == ','):
             num = num + line[i]
             i = i + 1
 
+        # 如果num大于零，则表示检测到了中文数字（各种类型）
         if len(num) != 0:
             process_num = preprocess_data(num)
-            nums = test_two_num(process_num)
+            # 检测“三十三百”这种情况
+            nums = test_multiple_nums(process_num)
             nums_inf = nums_inf + [(sub_num, i - (len(num) - process_num.find(sub_num)) + 1) for sub_num in nums]
             num = ''
             # nums_inf.append((preprocess_data(num), i - len(num) + 1))
