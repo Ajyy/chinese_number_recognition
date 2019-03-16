@@ -35,6 +35,11 @@ def find_size(num):
 
 
 def test_for_non_unit_num(num):
+    """
+    此方法将会对无单位中文数字进行检测，如果符合条件直接输出结果
+    :param num: 中文数字（包括各种形式）
+    :return: 如果不符合条件，返回0，如果符合则返回对应的值
+    """
     en_num = 0
     base = 1
     for idx in reversed(range(len(num))):
